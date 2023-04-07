@@ -1,9 +1,6 @@
 from typing import List
-
+import globals
 from neighborhood import Neighborhood
-
-X = 20
-Y = 20
 
 
 class Tower:
@@ -16,7 +13,7 @@ class Tower:
         self.serve_neighborhood = serve_neighborhood
 
     def set(self, x_val, y_val):
-        if x_val <= X:
+        if x_val <= globals.city_row:
             self.x_value = x_val
-        if y_val <= Y:
+        if y_val <= globals.city_col:
             self.y_value = y_val
