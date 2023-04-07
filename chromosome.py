@@ -1,6 +1,6 @@
 from typing import List
 
-from Tower import Tower
+from tower import Tower
 
 
 class Chromosome:

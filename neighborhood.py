@@ -1,6 +1,6 @@
 class Neighborhood:
-    def __init__(self, x_value, y_value, population, bandwidth):
-        self.x_value = x_value
-        self.y_value = y_value
+    def __init__(self, x, y, population):
+        self.x = x
+        self.y = y
         self.population = population
-        self.bandwidth = bandwidth
+        self.bandwidth = None
