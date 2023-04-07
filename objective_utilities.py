@@ -21,9 +21,10 @@ def neigh_nominal_bandwidth(neigh: Neighborhood, tower: Tower):
 def neigh_actual_bandwidth(neigh: Neighborhood, tower: Tower, neigh_nominal_bandwidth):
     neigh_v = np.array([neigh.x, neigh.y])
     tower_v = np.array([tower.x_value, tower.y_value])
-    matrix = np.array([[0., 8.], [8., 0.]])
-    temp = -0.5 * np.matmul((neigh_v - tower_v), inv(matrix), np.transpose(neigh_v - tower_v))
+    matrix = np.array([[8., 0.], [0., 8.]])
+    temp = -0.5 * np.matmul(np.matmul((neigh_v - tower_v), inv(matrix)), np.transpose(neigh_v - tower_v))
     cov = np.exp(temp)
     actual_bandwidth = cov * neigh_nominal_bandwidth
     return actual_bandwidth
+
 

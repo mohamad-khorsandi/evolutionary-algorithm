@@ -12,6 +12,7 @@ city_row = None
 city_col = None
 neighborhood_list = []
 
+
 def read_config():
     with open('problem_config.json') as user_file:
         file_contents = user_file.read()
@@ -29,6 +30,7 @@ def read_config():
     user_satisfaction_levels = parsed_json['user_satisfaction_levels']
     user_satisfaction_scores = parsed_json['user_satisfaction_scores']
 
+
 def make_city_list():
     global city_row
     global city_col
@@ -44,4 +46,3 @@ def make_city_list():
         for j in range(city_col):
             tmp_nbr = Neighborhood(i, j, population[i][j])
             neighborhood_list.append(tmp_nbr)
-
