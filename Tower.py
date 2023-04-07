@@ -6,7 +6,7 @@ X = 20
 Y = 20
 
 
-class Gen:
+class Tower:
 
     def __init__(self, x_value, y_value, bandwidth, serve_neighborhood: List[Neighborhood]):
         self.name = id

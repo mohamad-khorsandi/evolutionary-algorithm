@@ -1,12 +1,11 @@
 from typing import List
 
-from Gen import Gen
+from Tower import Tower
 
 
 class Chromosome:
-    chromosome = [Gen]
 
-    def __init__(self, gens : List[Gen]):
+    def __init__(self, gens: List[Tower]):
         self.chromosome = gens
 
     # def objective_function:
