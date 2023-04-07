@@ -8,6 +8,7 @@ def main():
         csv_reader = csv.reader(csv_file, delimiter=',')
         data = np.array(list(csv_reader)).astype(float)
     config.read_config()
+    # print(data)
 
 
 
