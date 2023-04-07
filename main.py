@@ -1,12 +1,13 @@
 import csv
+import config
+import numpy as np
 
 
 def main():
     with open('blocks_population.csv') as csv_file:
         csv_reader = csv.reader(csv_file, delimiter=',')
-        for row in csv_reader:
-            for n in row:
-                print(n)
+        data = np.array(list(csv_reader)).astype(float)
+    config.read_config()
 
 
 
