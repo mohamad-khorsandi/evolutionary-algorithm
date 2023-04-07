@@ -18,9 +18,10 @@ iteration = 200
 parent_pool_size = 50
 
 def init_globals():
-    assert parent_pool_size >= generation_size
+    assert parent_pool_size <= generation_size
     __read_config()
     __make_city_list()
+
 
 def __read_config():
     with open('problem_config.json') as user_file:

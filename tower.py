@@ -1,7 +1,4 @@
-from typing import List
 import globals
-from neighborhood import Neighborhood
-from objective_utilities import user_bandwidth
 
 
 class Tower:
