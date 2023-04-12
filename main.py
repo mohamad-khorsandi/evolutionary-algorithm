@@ -56,13 +56,11 @@ def get_weight_list(chromosome_list: list, reverse=False):
 
 
 def mutation(chromosome, P_mut):
-    if not np.random.binomial(1, P_mut, 1):
-        print("not doing mutation")
-        return chromosome
-
     for gene in chromosome.gens:
-        if np.random.binomial(1, 0.9, 1):
-            gene.set_xANDyANDbw(np.random.normal(), np.random.normal(), np.random.normal(loc=0, scale=10, size=1))
+        if np.random.binomial(1, P_mut, 1):
+            gene.set_xANDyANDbw(np.random.normal(scale=CONVERGE_RATE),
+                                np.random.normal(scale=CONVERGE_RATE),
+                                np.random.normal(loc=0, scale=CONVERGE_RATE, size=1))
 
     chromosome.assign_neighborhoods()
     chromosome.update_fittness()
@@ -71,8 +69,7 @@ def mutation(chromosome, P_mut):
 
 def recombination(parent1: Chromosome, parent2: Chromosome, P_rec):
     if not np.random.binomial(1, P_rec, 1):
-        print("not doing recombination")
-        return parent1 if parent1.get_fittness() >= parent2.get_fittness() else parent2
+        return parent1, parent2
 
     # Determine the shorter parent
     shorter_parent = parent1 if len(parent1.gens) < len(parent2.gens) else parent2
@@ -84,16 +81,16 @@ def recombination(parent1: Chromosome, parent2: Chromosome, P_rec):
     # Create the first offspring by performing Whole Arithmetic Crossover
     tower_list1 = []
     for i in range(len(shorter_parent.gens)):
-        new_x = weight * parent1.gens[i].x_value + (1 - weight) * parent2.gens[i].x_value
-        new_y = weight * parent1.gens[i].y_value + (1 - weight) * parent2.gens[i].y_value
+        new_x = weight * parent1.gens[i].x + (1 - weight) * parent2.gens[i].x
+        new_y = weight * parent1.gens[i].y + (1 - weight) * parent2.gens[i].y
         new_bw = weight * parent1.gens[i].bandwidth + (1 - weight) * parent2.gens[i].bandwidth
         gen = Tower(new_x, new_y, new_bw)
         tower_list1.append(gen)
 
     # Add any remaining genes from the longer parent to the first offspring
     for i in range(len(shorter_parent.gens), len(longer_parent.gens)):
-        new_x = weight * longer_parent.gens[i].x_value
-        new_y = weight * longer_parent.gens[i].y_value
+        new_x = weight * longer_parent.gens[i].x
+        new_y = weight * longer_parent.gens[i].y
         new_bw = weight * longer_parent.gens[i].bandwidth
         gen = Tower(new_x, new_y, new_bw)
         tower_list1.append(gen)
@@ -101,16 +98,16 @@ def recombination(parent1: Chromosome, parent2: Chromosome, P_rec):
     # Create the second offspring by performing Whole Arithmetic Crossover (swapping parents)
     tower_list2 = []
     for i in range(len(shorter_parent.gens)):
-        new_x = (1 - weight) * parent1.gens[i].x_value + weight * parent2.gens[i].x_value
-        new_y = (1 - weight) * parent1.gens[i].y_value + weight * parent2.gens[i].y_value
+        new_x = (1 - weight) * parent1.gens[i].x + weight * parent2.gens[i].x
+        new_y = (1 - weight) * parent1.gens[i].y + weight * parent2.gens[i].y
         new_bw = (1 - weight) * parent1.gens[i].bandwidth + weight * parent2.gens[i].bandwidth
         gen = Tower(new_x, new_y, new_bw)
         tower_list2.append(gen)
 
     # Add any remaining genes from the longer parent to the second offspring
     for i in range(len(shorter_parent.gens), len(longer_parent.gens)):
-        new_x = (1 - weight) * longer_parent.gens[i].x_value
-        new_y = (1 - weight) * longer_parent.gens[i].y_value
+        new_x = (1 - weight) * longer_parent.gens[i].x
+        new_y = (1 - weight) * longer_parent.gens[i].y
         new_bw = (1 - weight) * longer_parent.gens[i].bandwidth
         gen = Tower(new_x, new_y, new_bw)
         tower_list2.append(gen)
@@ -140,7 +137,7 @@ def cut_and_crossfill(parent1: Chromosome, parent2: Chromosome):
     for i in range(start, end):
         find = 0
         for g in offspring1:
-            if longer_parent.gens[i].x_value == g.x_value and longer_parent.gens[i].y_value == g.y_value:
+            if longer_parent.gens[i].x == g.x and longer_parent.gens[i].y == g.y:
                 find = 1
                 break
         if find == 0:
@@ -157,7 +154,7 @@ def cut_and_crossfill(parent1: Chromosome, parent2: Chromosome):
     for i in range(start, end):
         find = 0
         for g in offspring2:
-            if longer_parent.gens[i].x_value == g.x_value and longer_parent.gens[i].y_value == g.y_value:
+            if longer_parent.gens[i].x == g.x and longer_parent.gens[i].y == g.y:
                 find = 1
                 break
         if find == 0:

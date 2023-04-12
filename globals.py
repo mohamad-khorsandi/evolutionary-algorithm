@@ -15,13 +15,12 @@ CITY = []
 # hyper parameters
 MAX_TOWER_COUNT = 5
 POPULATION_SIZE = 10
-MAX_BAND_WIDTH = 1000# todo
+MAX_BAND_WIDTH = 1000 # todo calculate
 ITERATION = 10
 PARENT_POOL_SIZE = 3
 P_MUT = 1
 P_REC = 1
-
-
+CONVERGE_RATE = 10
 def init_globals():
     assert PARENT_POOL_SIZE <= POPULATION_SIZE
     __read_config()

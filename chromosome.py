@@ -34,7 +34,7 @@ class Chromosome:
             min_dist = inf
             min_tower = None
             for tower in self.gens:
-                distance = neigh.dis(tower.x_value, tower.y_value)
+                distance = neigh.dis(tower.x, tower.y)
                 if distance < min_dist:
                     min_dist = distance
                     min_tower = tower
@@ -44,7 +44,7 @@ class Chromosome:
         colors = ['r', 'g', 'b', 'c', 'm', 'y', 'k']
         plt.figure(figsize=(globals.CITY_ROW, globals.CITY_COL))
         for i, tower in enumerate(self.gens):
-            plt.scatter(tower.x_value, tower.y_value, marker='>', color=colors[i])
+            plt.scatter(tower.x, tower.y, marker='>', color=colors[i])
             neigh_points = []
 
             for n in tower.serve_neighborhood:

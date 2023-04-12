@@ -23,7 +23,7 @@ class Neighborhood:
 
     def neigh_actual_bandwidth(self, tower: Tower):
         neigh_v = np.array([self.x, self.y])
-        tower_v = np.array([tower.x_value, tower.y_value])
+        tower_v = np.array([tower.x, tower.y])
         matrix = np.array([[8., 0.], [0., 8.]])
         temp = -0.5 * np.matmul(np.matmul((neigh_v - tower_v), inv(matrix)), np.transpose(neigh_v - tower_v))
         cov = np.exp(temp)
