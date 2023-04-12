@@ -123,7 +123,7 @@ def cut_and_crossfill(parent1: Chromosome, parent2: Chromosome):
     return offspring1, offspring2
 
 
-def assign_neighborhood_to_toweer(city: List[Neighborhood], centroids: List[Tower]):
+def assign_neighborhood_to_toweer(city: List[Neighborhood], centroids: Chromosome):
     diff = 1
     # Store the cluster number of each digit in this array
     region = np.zeros(len(city))
@@ -133,7 +133,7 @@ def assign_neighborhood_to_toweer(city: List[Neighborhood], centroids: List[Towe
         for i, neigh in enumerate(city):
             mn_dist = float('inf')
             # dist of the point from all centroids
-            for idx, centroid in enumerate(centroids):
+            for idx, centroid in enumerate(centroids.gens):
                 distance = np.sqrt(((centroid.x_value - neigh.x) ** 2) + ((centroid.y_value - neigh.y) ** 2))
                 # store closest centroid
                 if mn_dist > distance:
