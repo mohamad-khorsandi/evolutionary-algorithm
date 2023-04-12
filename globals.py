@@ -37,7 +37,7 @@ def __read_config():
     global USER_SATISFACTION_SCORES
 
     TOWER_CONSTRUCTION_COST = parsed_json['tower_construction_cost']
-    TOWER_MAINTENANCE_COST = parsed_json['tower_maintenance_cost']
+    TOWER_MAINTENANCE_COST = parsed_json['tower_maintanance_cost']
     USER_SATISFACTION_LEVELS = parsed_json['user_satisfaction_levels']
     USER_SATISFACTION_SCORES = parsed_json['user_satisfaction_scores']
 
