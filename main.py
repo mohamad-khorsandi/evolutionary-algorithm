@@ -1,10 +1,9 @@
 from random import randrange, uniform, choices
 from globals import *
-from random import randrange, uniform, random
 import globals
 from chromosome import Chromosome
 from tower import Tower
-
+import pandas as pd
 
 def main():
     init_globals()
@@ -28,13 +27,25 @@ def select_parent(generation, count):
 
 def get_weight_list(chromosome_list: list, reverse=False):
     fittness_list = [c.get_fittness() for c in chromosome_list]
+    min_fittness = min(fittness_list)
+    if min_fittness < 0:
+        fittness_list = [fittness - min_fittness for fittness in fittness_list]
+
+    fittness_sum = sum(fittness_list)
+    weight_list = [p / fittness_sum for p in fittness_list]
+
+    assert any([0 <= p <= 1 for p in weight_list])
+    if reverse:
+        return [1 - p for p in weight_list]
+    else:
+        return weight_list
+
+
 def mutation(chromosome):
-    #
     for gene in chromosome.gens:
-        if random.binomial(1,0.9,1):
-            gene = gene.set_xANDyANDbw(random.normal(),random.normal(),random.normal(loc = 0, scale = 10, size = 1))
+        if np.random.binomial(1, 0.9, 1):
+            gene = gene.set_xANDyANDbw(np.random.normal(),np.random.normal(),np.random.normal(loc = 0, scale = 10, size = 1))
     return chromosome
-    #
 
 
 def whole_arithmetic_crossover(parent1: Chromosome, parent2: Chromosome):
@@ -43,7 +54,7 @@ def whole_arithmetic_crossover(parent1: Chromosome, parent2: Chromosome):
     longer_parent = parent2 if len(parent1.gens) < len(parent2.gens) else parent1
 
     # Calculate the crossover rate
-    weight = random.uniform(0, 1)
+    weight = np.random.uniform(0, 1)
 
     # Create the first offspring by performing Whole Arithmetic Crossover
     offspring1 = []
@@ -87,7 +98,7 @@ def cut_and_crossfill(parent1: Chromosome, parent2: Chromosome):
     longer_parent = parent2 if len(parent1.gens) < len(parent2.gens) else parent1
 
     # Choose a random crossover point
-    crossover_point = random.randint(1, len(shorter_parent.gens) - 1)
+    crossover_point = np.random.randint(1, len(shorter_parent.gens) - 1)
 
     # Create the offspring by copying the first part of the shorter parent
     offspring1 = shorter_parent.gens[:crossover_point]
@@ -132,7 +143,7 @@ def cut_and_crossfill(parent1: Chromosome, parent2: Chromosome):
     return offspring1, offspring2
 
 
-def assign_neighborhood_to_toweer(city: List[Neighborhood], centroids: Chromosome):
+def assign_neighborhood_to_toweer(city: list[Neighborhood], centroids: Chromosome):
     diff = 1
     # Store the cluster number of each digit in this array
     region = np.zeros(len(city))
@@ -160,32 +171,15 @@ def assign_neighborhood_to_toweer(city: List[Neighborhood], centroids: Chromosom
     return centroids, region
 
 
-def recombination():
-    pass
-
-    min_fittness = min(fittness_list)
-    if min_fittness < 0:
-        fittness_list = [fittness - min_fittness for fittness in fittness_list]
-
-    fittness_sum = sum(fittness_list)
-    weight_list = [p / fittness_sum for p in fittness_list]
-
-    assert any([0 <= p <= 1 for p in weight_list])
-    if reverse:
-        return [1 - p for p in weight_list]
-    else:
-        return weight_list
-
-
 def get_rand_generation():
     generation = []
-    for _ in range(globals.generation_size):
-        tower_count = randrange(1, globals.max_tower_count + 1)
+    for _ in range(globals.GENERATION_SIZE):
+        tower_count = randrange(1, globals.MAX_TOWER_COUNT + 1)
         tower_list = []
         for _ in range(tower_count):
-            x = uniform(0, globals.city_row)
-            y = uniform(0, globals.city_col)
-            band_width = uniform(1, globals.max_band_width)
+            x = uniform(0, globals.CITY_ROW)
+            y = uniform(0, globals.CITY_COL)
+            band_width = uniform(1, globals.MAX_BAND_WIDTH)
             tower_list.append(Tower(x, y, band_width))
         tmp_crm = Chromosome(tower_list)
         generation.append(tmp_crm)

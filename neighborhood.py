@@ -19,7 +19,7 @@ class Neighborhood:
         for neigh in tower.serve_neighborhood:
             total_population += neigh.population
 
-        neigh_nominal_BW = (neigh.population * tower.bandwidth) / total_population
+        neigh_nominal_BW = (self.population * tower.bandwidth) / total_population
         return neigh_nominal_BW
 
     def neigh_actual_bandwidth(self, tower: Tower):
@@ -43,4 +43,4 @@ class Neighborhood:
         elif user_bw >= 3:
             satisfaction_score = 30
 
-        return satisfaction_score
+        return satisfaction_score * len(self.population)
