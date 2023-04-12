@@ -9,7 +9,7 @@ class Neighborhood:
         self.x = x
         self.y = y
         self.population = population
-        self.bandwidth = None
+        self.bandwidth = None  # todo remove this?
 
     def neigh_satisfaction(self, tower: Tower):
         return self.population * user_bandwidth(self.population, tower.bandwidth)

@@ -3,22 +3,24 @@ import json
 import numpy as np
 from neighborhood import Neighborhood
 
-tower_construction_cost = None
-tower_maintenance_cost = None
-user_satisfaction_levels = None
-user_satisfaction_scores = None
-population = None
-city_row = None
-city_col = None
-neighborhood_list = []
-max_tower_count = 25
-generation_size = 400
-max_band_width = 1000
-iteration = 200
-parent_pool_size = 50
+# problem config
+TOWER_CONSTRUCTION_COST = None
+TOWER_MAINTENANCE_COST = None
+USER_SATISFACTION_LEVELS = None
+USER_SATISFACTION_SCORES = None
+CITY_ROW = None
+CITY_COL = None
+NEIGHBORHOOD_LIST = []
+
+# hyper parameters
+MAX_TOWER_COUNT = 25
+GENERATION_SIZE = 400
+MAX_BAND_WIDTH = 1000
+ITERATION = 200
+PARENT_POOL_SIZE = 50
 
 def init_globals():
-    assert parent_pool_size <= generation_size
+    assert PARENT_POOL_SIZE <= GENERATION_SIZE
     __read_config()
     __make_city_list()
 
@@ -30,29 +32,29 @@ def __read_config():
     print(file_contents)
 
     parsed_json = json.loads(file_contents)
-    global tower_construction_cost
-    global tower_maintenance_cost
-    global user_satisfaction_levels
-    global user_satisfaction_scores
+    global TOWER_CONSTRUCTION_COST
+    global TOWER_MAINTENANCE_COST
+    global USER_SATISFACTION_LEVELS
+    global USER_SATISFACTION_SCORES
 
-    tower_construction_cost = parsed_json['tower_construction_cost']
-    tower_maintenance_cost = parsed_json['tower_maintanance_cost']
-    user_satisfaction_levels = parsed_json['user_satisfaction_levels']
-    user_satisfaction_scores = parsed_json['user_satisfaction_scores']
+    TOWER_CONSTRUCTION_COST = parsed_json['tower_construction_cost']
+    TOWER_MAINTENANCE_COST = parsed_json['tower_maintanance_cost']
+    USER_SATISFACTION_LEVELS = parsed_json['user_satisfaction_levels']
+    USER_SATISFACTION_SCORES = parsed_json['user_satisfaction_scores']
 
 
 def __make_city_list():
-    global city_row
-    global city_col
-    global neighborhood_list
+    global CITY_ROW
+    global CITY_COL
+    global NEIGHBORHOOD_LIST
 
     with open('blocks_population.csv') as csv_file:
         csv_reader = csv.reader(csv_file, delimiter=',')
         population = np.array(list(csv_reader)).astype(float)
-    city_row = population.shape[0]
-    city_col = population.shape[1]
+    CITY_ROW = population.shape[0]
+    CITY_COL = population.shape[1]
 
-    for i in range(city_row):
-        for j in range(city_col):
+    for i in range(CITY_ROW):
+        for j in range(CITY_COL):
             tmp_nbr = Neighborhood(i, j, population[i][j])
-            neighborhood_list.append(tmp_nbr)
+            NEIGHBORHOOD_LIST.append(tmp_nbr)
