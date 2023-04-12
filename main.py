@@ -19,8 +19,13 @@ def main():
         parent_pool = []
 
 
-def mutation():
-    pass
+def mutation(chromosome):
+    #
+    for gene in chromosome.gens:
+        if random.binomial(1,0.9,1):
+            gene = gene.set_xANDyANDbw(random.normal(),random.normal(),random.normal(loc = 0, scale = 10, size = 1))
+    return chromosome
+    #
 
 
 def whole_arithmetic_crossover(parent1: Chromosome, parent2: Chromosome):
