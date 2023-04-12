@@ -25,7 +25,6 @@ def init_globals():
     __read_config()
     __make_city_list()
 
-
 def __read_config():
     with open('problem_config.json') as user_file:
         file_contents = user_file.read()

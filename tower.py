@@ -27,3 +27,10 @@ class Tower:
 
     def obj_func(self):
         return self.satisfaction() - self.total_build_cost()  # todo change to / to prevent neg obj
+
+    def set_xANDyANDbw(self, rand1, rand2, rand3):
+        x_val = self.x_value + rand1
+        y_val = self.y_value + rand2
+        band_width = self.bandwidth + rand3
+        self.set(self, x_val, y_val, band_width)
+        return self
