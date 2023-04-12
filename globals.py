@@ -19,6 +19,7 @@ MAX_BAND_WIDTH = 1000
 ITERATION = 200
 PARENT_POOL_SIZE = 50
 
+
 def init_globals():
     assert PARENT_POOL_SIZE <= GENERATION_SIZE
     __read_config()
@@ -29,8 +30,6 @@ def __read_config():
     with open('problem_config.json') as user_file:
         file_contents = user_file.read()
 
-    print(file_contents)
-
     parsed_json = json.loads(file_contents)
     global TOWER_CONSTRUCTION_COST
     global TOWER_MAINTENANCE_COST
@@ -38,7 +37,7 @@ def __read_config():
     global USER_SATISFACTION_SCORES
 
     TOWER_CONSTRUCTION_COST = parsed_json['tower_construction_cost']
-    TOWER_MAINTENANCE_COST = parsed_json['tower_maintanance_cost']
+    TOWER_MAINTENANCE_COST = parsed_json['tower_maintenance_cost']
     USER_SATISFACTION_LEVELS = parsed_json['user_satisfaction_levels']
     USER_SATISFACTION_SCORES = parsed_json['user_satisfaction_scores']
 
