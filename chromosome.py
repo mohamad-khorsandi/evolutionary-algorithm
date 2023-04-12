@@ -1,4 +1,5 @@
 from typing import List
+
 from tower import Tower
 
 
@@ -22,3 +23,6 @@ class Chromosome:
             self.__fitness = self.__objective_function()
 
         return self.__fitness
+
+    def update_fittness(self):
+        self.__fitness = self.__objective_function()

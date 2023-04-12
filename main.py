@@ -1,16 +1,36 @@
 from random import randrange, uniform, choices
-from globals import *
-import globals
-from chromosome import Chromosome
-from tower import Tower
+
 import pandas as pd
 
+import globals
+from chromosome import Chromosome
+from globals import *
+from tower import Tower
+
+
 def main():
+    # init_globals()
+    # generation = get_rand_generation()
+    # for i in range(ITERATION):
+    #     parent_pool = select_parent(generation, PARENT_POOL_SIZE)
+    #
+    #     remove_offspring(generation, PARENT_POOL_SIZE)
+
+    # initial population of random bitstring
     init_globals()
-    generation = get_rand_generation()
-    for i in range(ITERATION):
-        parent_pool = select_parent(generation, PARENT_POOL_SIZE)
-        remove_offspring(generation, PARENT_POOL_SIZE)
+    population = get_rand_population()
+    # keep track of best solution
+    # best, best_eval = 0, objective(pop[0])
+    # enumerate generations
+    for gen in range(globals.ITERATION):
+        parent_pool = select_parent(population, PARENT_POOL_SIZE)
+        children = list()
+        for i in range(0, GENERATION_SIZE, 2):
+            p1, p2 = parent_pool[i], parent_pool[i + 1]
+            for c in whole_arithmetic_crossover(p1, p2, globals.P_REC):
+                mutation(c, globals.P_MUT)
+                children.append(c)
+        remove_offspring(population, PARENT_POOL_SIZE)
 
 
 def remove_offspring(generation: list, count):
@@ -41,14 +61,20 @@ def get_weight_list(chromosome_list: list, reverse=False):
         return weight_list
 
 
-def mutation(chromosome):
+def mutation(chromosome, P_mut):
+    if not np.random.binomial(1, P_mut, 1):
+        return chromosome
+
     for gene in chromosome.gens:
         if np.random.binomial(1, 0.9, 1):
-            gene = gene.set_xANDyANDbw(np.random.normal(),np.random.normal(),np.random.normal(loc = 0, scale = 10, size = 1))
+            gene.set_xANDyANDbw(np.random.normal(), np.random.normal(), np.random.normal(loc=0, scale=10, size=1))
     return chromosome
 
 
-def whole_arithmetic_crossover(parent1: Chromosome, parent2: Chromosome):
+def whole_arithmetic_crossover(parent1: Chromosome, parent2: Chromosome, P_rec):
+    if not np.random.binomial(1, P_rec, 1):
+        return parent1 if parent1.get_fittness() > parent2.get_fittness() else parent2
+
     # Determine the shorter parent
     shorter_parent = parent1 if len(parent1.gens) < len(parent2.gens) else parent2
     longer_parent = parent2 if len(parent1.gens) < len(parent2.gens) else parent1
@@ -171,7 +197,7 @@ def assign_neighborhood_to_toweer(city: list[Neighborhood], centroids: Chromosom
     return centroids, region
 
 
-def get_rand_generation():
+def get_rand_population():
     generation = []
     for _ in range(globals.GENERATION_SIZE):
         tower_count = randrange(1, globals.MAX_TOWER_COUNT + 1)
