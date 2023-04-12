@@ -1,5 +1,6 @@
+from cmath import inf
 from typing import List
-
+from globals import CITY
 from tower import Tower
 
 
@@ -26,3 +27,14 @@ class Chromosome:
 
     def update_fittness(self):
         self.__fitness = self.__objective_function()
+
+    def assign_neighborhoods(self):
+        for neigh in CITY:
+            min_dist = inf
+            min_tower = None
+            for tower in self.gens:
+                distance = neigh.dis(tower.x_value, tower.y_value)
+                if distance < min_dist:
+                    min_dist = distance
+                    min_tower = tower
+            min_tower.serve_neighborhood.append(neigh)

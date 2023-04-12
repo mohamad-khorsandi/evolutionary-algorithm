@@ -10,11 +10,11 @@ USER_SATISFACTION_LEVELS = None
 USER_SATISFACTION_SCORES = None
 CITY_ROW = None
 CITY_COL = None
-NEIGHBORHOOD_LIST = []
+CITY = []
 
 # hyper parameters
 MAX_TOWER_COUNT = 5
-GENERATION_SIZE = 10
+POPULATION_SIZE = 10
 MAX_BAND_WIDTH = 1000
 ITERATION = 10
 PARENT_POOL_SIZE = 3
@@ -23,7 +23,7 @@ P_REC = 1
 
 
 def init_globals():
-    assert PARENT_POOL_SIZE <= GENERATION_SIZE
+    assert PARENT_POOL_SIZE <= POPULATION_SIZE
     __read_config()
     __make_city_list()
 
@@ -46,9 +46,9 @@ def __read_config():
 def __make_city_list():
     global CITY_ROW
     global CITY_COL
-    global NEIGHBORHOOD_LIST
+    global CITY
 
-    with open('blocks_population.csv') as csv_file:
+    with open('pop2.csv') as csv_file:
         csv_reader = csv.reader(csv_file, delimiter=',')
         population = np.array(list(csv_reader)).astype(float)
     CITY_ROW = population.shape[0]
@@ -57,4 +57,4 @@ def __make_city_list():
     for i in range(CITY_ROW):
         for j in range(CITY_COL):
             tmp_nbr = Neighborhood(i, j, population[i][j])
-            NEIGHBORHOOD_LIST.append(tmp_nbr)
+            CITY.append(tmp_nbr)

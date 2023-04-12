@@ -1,7 +1,4 @@
 from random import randrange, uniform, choices
-
-import pandas as pd
-
 import globals
 from chromosome import Chromosome
 from globals import *
@@ -9,31 +6,25 @@ from tower import Tower
 
 
 def main():
-    # init_globals()
-    # generation = get_rand_generation()
-    # for i in range(ITERATION):
-    #     parent_pool = select_parent(generation, PARENT_POOL_SIZE)
-    #
-    #     remove_offspring(generation, PARENT_POOL_SIZE)
-
-    # initial population of random bitstring
     init_globals()
     population = get_rand_population()
-    # keep track of best solution
-    # best, best_eval = 0, objective(pop[0])
-    # enumerate generations
+
+    for ch in population:
+        ch.assign_neighborhoods()
+
     for gen in range(globals.ITERATION):
         parent_pool = select_parent(population, PARENT_POOL_SIZE)
         children = list()
-        for i in range(0, GENERATION_SIZE, 2):
+        for i in range(0, POPULATION_SIZE, 2):
             p1, p2 = parent_pool[i], parent_pool[i + 1]
-            for c in whole_arithmetic_crossover(p1, p2, globals.P_REC):
+            for c in recombination(p1, p2, globals.P_REC):
                 mutation(c, globals.P_MUT)
                 children.append(c)
-        remove_offspring(population, PARENT_POOL_SIZE)
+        remove_worst(population, PARENT_POOL_SIZE)
+        population.extend(children)
 
 
-def remove_offspring(generation: list, count):
+def remove_worst(generation: list, count):
     prob_list = get_weight_list(generation, reverse=True)
     offspring = choices(generation, prob_list, k=count)
     for chromosome in offspring:
@@ -71,7 +62,7 @@ def mutation(chromosome, P_mut):
     return chromosome
 
 
-def whole_arithmetic_crossover(parent1: Chromosome, parent2: Chromosome, P_rec):
+def recombination(parent1: Chromosome, parent2: Chromosome, P_rec):
     if not np.random.binomial(1, P_rec, 1):
         return parent1 if parent1.get_fittness() > parent2.get_fittness() else parent2
 
@@ -169,37 +160,12 @@ def cut_and_crossfill(parent1: Chromosome, parent2: Chromosome):
     return offspring1, offspring2
 
 
-def assign_neighborhood_to_toweer(city: list[Neighborhood], centroids: Chromosome):
-    diff = 1
-    # Store the cluster number of each digit in this array
-    region = np.zeros(len(city))
 
-    while diff:
-        # for each observation
-        for i, neigh in enumerate(city):
-            mn_dist = float('inf')
-            # dist of the point from all centroids
-            for idx, centroid in enumerate(centroids.gens):
-                distance = np.sqrt(((centroid.x_value - neigh.x) ** 2) + ((centroid.y_value - neigh.y) ** 2))
-                # store closest centroid
-                if mn_dist > distance:
-                    mn_dist = distance
-                region[i] = idx
-
-            new_centroids = pd.DataFrame(city).groupby(by=region).mean().values
-
-            # if centroids are same then leave
-            if np.count_nonzero(centroids - new_centroids) == 0:
-                diff = 0
-            else:
-                centroids = new_centroids
-
-    return centroids, region
 
 
 def get_rand_population():
     generation = []
-    for _ in range(globals.GENERATION_SIZE):
+    for _ in range(globals.POPULATION_SIZE):
         tower_count = randrange(1, globals.MAX_TOWER_COUNT + 1)
         tower_list = []
         for _ in range(tower_count):

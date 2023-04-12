@@ -9,7 +9,6 @@ class Neighborhood:
         self.x = x
         self.y = y
         self.population = population
-        self.bandwidth = None  # todo remove this?
 
     def neigh_satisfaction(self, tower: Tower):
         return self.population * user_bandwidth(self.population, tower.bandwidth)
@@ -44,3 +43,6 @@ class Neighborhood:
             satisfaction_score = 30
 
         return satisfaction_score * len(self.population)
+
+    def dis(self, x, y):
+        return np.sqrt(((self.x - x) ** 2) + ((self.y - y) ** 2))

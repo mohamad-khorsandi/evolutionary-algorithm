@@ -6,7 +6,7 @@ class Tower:
         self.x_value = x_value
         self.y_value = y_value
         self.bandwidth = bandwidth
-        self.serve_neighborhood = None
+        self.serve_neighborhood = []
 
     def set(self, x_val, y_val, band_width):
         if x_val <= globals.CITY_ROW:
