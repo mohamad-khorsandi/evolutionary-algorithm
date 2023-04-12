@@ -42,7 +42,7 @@ class Neighborhood:
         elif user_bw >= 3:
             satisfaction_score = 30
 
-        return satisfaction_score * len(self.population)
+        return satisfaction_score * self.population
 
     def dis(self, x, y):
         return np.sqrt(((self.x - x) ** 2) + ((self.y - y) ** 2))

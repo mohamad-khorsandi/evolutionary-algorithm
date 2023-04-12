@@ -1,4 +1,7 @@
 from random import randrange, uniform, choices
+
+import matplotlib.pyplot as plt
+
 import globals
 from chromosome import Chromosome
 from globals import *
@@ -8,20 +11,20 @@ from tower import Tower
 def main():
     init_globals()
     population = get_rand_population()
-
-    for ch in population:
-        ch.assign_neighborhoods()
-
+    fittness_hist = []
     for gen in range(globals.ITERATION):
+        fittness_hist.append(np.mean([c.get_fittness() for c in population]))
         parent_pool = select_parent(population, PARENT_POOL_SIZE)
         children = list()
-        for i in range(0, POPULATION_SIZE, 2):
+        for i in range(0, PARENT_POOL_SIZE - 1, 2):
             p1, p2 = parent_pool[i], parent_pool[i + 1]
             for c in recombination(p1, p2, globals.P_REC):
                 mutation(c, globals.P_MUT)
                 children.append(c)
         remove_worst(population, PARENT_POOL_SIZE)
         population.extend(children)
+
+    plt.plot(range(globals.ITERATION), fittness_hist)
 
 
 def remove_worst(generation: list, count):
@@ -54,17 +57,22 @@ def get_weight_list(chromosome_list: list, reverse=False):
 
 def mutation(chromosome, P_mut):
     if not np.random.binomial(1, P_mut, 1):
+        print("not doing mutation")
         return chromosome
 
     for gene in chromosome.gens:
         if np.random.binomial(1, 0.9, 1):
             gene.set_xANDyANDbw(np.random.normal(), np.random.normal(), np.random.normal(loc=0, scale=10, size=1))
+
+    chromosome.assign_neighborhoods()
+    chromosome.update_fittness()
     return chromosome
 
 
 def recombination(parent1: Chromosome, parent2: Chromosome, P_rec):
     if not np.random.binomial(1, P_rec, 1):
-        return parent1 if parent1.get_fittness() > parent2.get_fittness() else parent2
+        print("not doing recombination")
+        return parent1 if parent1.get_fittness() >= parent2.get_fittness() else parent2
 
     # Determine the shorter parent
     shorter_parent = parent1 if len(parent1.gens) < len(parent2.gens) else parent2
@@ -74,13 +82,13 @@ def recombination(parent1: Chromosome, parent2: Chromosome, P_rec):
     weight = np.random.uniform(0, 1)
 
     # Create the first offspring by performing Whole Arithmetic Crossover
-    offspring1 = []
+    tower_list1 = []
     for i in range(len(shorter_parent.gens)):
         new_x = weight * parent1.gens[i].x_value + (1 - weight) * parent2.gens[i].x_value
         new_y = weight * parent1.gens[i].y_value + (1 - weight) * parent2.gens[i].y_value
         new_bw = weight * parent1.gens[i].bandwidth + (1 - weight) * parent2.gens[i].bandwidth
         gen = Tower(new_x, new_y, new_bw)
-        offspring1.append(gen)
+        tower_list1.append(gen)
 
     # Add any remaining genes from the longer parent to the first offspring
     for i in range(len(shorter_parent.gens), len(longer_parent.gens)):
@@ -88,16 +96,16 @@ def recombination(parent1: Chromosome, parent2: Chromosome, P_rec):
         new_y = weight * longer_parent.gens[i].y_value
         new_bw = weight * longer_parent.gens[i].bandwidth
         gen = Tower(new_x, new_y, new_bw)
-        offspring1.append(gen)
+        tower_list1.append(gen)
 
     # Create the second offspring by performing Whole Arithmetic Crossover (swapping parents)
-    offspring2 = []
+    tower_list2 = []
     for i in range(len(shorter_parent.gens)):
         new_x = (1 - weight) * parent1.gens[i].x_value + weight * parent2.gens[i].x_value
         new_y = (1 - weight) * parent1.gens[i].y_value + weight * parent2.gens[i].y_value
         new_bw = (1 - weight) * parent1.gens[i].bandwidth + weight * parent2.gens[i].bandwidth
         gen = Tower(new_x, new_y, new_bw)
-        offspring2.append(gen)
+        tower_list2.append(gen)
 
     # Add any remaining genes from the longer parent to the second offspring
     for i in range(len(shorter_parent.gens), len(longer_parent.gens)):
@@ -105,8 +113,11 @@ def recombination(parent1: Chromosome, parent2: Chromosome, P_rec):
         new_y = (1 - weight) * longer_parent.gens[i].y_value
         new_bw = (1 - weight) * longer_parent.gens[i].bandwidth
         gen = Tower(new_x, new_y, new_bw)
-        offspring2.append(gen)
-
+        tower_list2.append(gen)
+    offspring1 = Chromosome(tower_list1)
+    offspring2 = Chromosome(tower_list2)
+    offspring1.assign_neighborhoods()
+    offspring2.assign_neighborhoods()
     return offspring1, offspring2
 
 
@@ -160,17 +171,14 @@ def cut_and_crossfill(parent1: Chromosome, parent2: Chromosome):
     return offspring1, offspring2
 
 
-
-
-
 def get_rand_population():
     generation = []
     for _ in range(globals.POPULATION_SIZE):
         tower_count = randrange(1, globals.MAX_TOWER_COUNT + 1)
         tower_list = []
         for _ in range(tower_count):
-            x = uniform(0, globals.CITY_ROW)
-            y = uniform(0, globals.CITY_COL)
+            x = uniform(0, globals.CITY_ROW - 1)
+            y = uniform(0, globals.CITY_COL - 1)
             band_width = uniform(1, globals.MAX_BAND_WIDTH)
             tower_list.append(Tower(x, y, band_width))
         tmp_crm = Chromosome(tower_list)
