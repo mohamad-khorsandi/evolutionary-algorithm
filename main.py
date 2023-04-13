@@ -10,28 +10,30 @@ from tower import Tower
 
 def main():
     init_globals()
-    population = get_rand_population()
+    population = gen_rand_population()
     fittness_hist = []
-    for gen in range(globals.ITERATION):
+    for _ in range(globals.ITERATION):
         fittness_hist.append(np.mean([c.get_fittness() for c in population]))
         parent_pool = select_parent(population, PARENT_POOL_SIZE)
-        children = list()
+        children = []
         for i in range(0, PARENT_POOL_SIZE - 1, 2):
             p1, p2 = parent_pool[i], parent_pool[i + 1]
             for c in recombination(p1, p2, globals.P_REC):
                 mutation(c, globals.P_MUT)
                 children.append(c)
-        remove_worst(population, PARENT_POOL_SIZE)
-        population.extend(children)
+        replace_children(population, children)
 
     plt.plot(range(globals.ITERATION), fittness_hist)
+    plt.show()
 
 
-def remove_worst(generation: list, count):
-    prob_list = get_weight_list(generation, reverse=True)
-    offspring = choices(generation, prob_list, k=count)
-    for chromosome in offspring:
-        generation.remove(chromosome)
+def replace_children(population: list, children):
+    for _ in range(len(children)):
+        prob_list = get_weight_list(population, reverse=True)
+        idx_tobe_removed = choices(range(len(population)), prob_list)[0]
+        del population[idx_tobe_removed]
+
+    population.extend(children)
 
 
 def select_parent(generation, count):
@@ -60,9 +62,9 @@ def mutation(chromosome, P_mut):
         if np.random.binomial(1, P_mut, 1):
             gene.set_xANDyANDbw(np.random.normal(scale=CONVERGE_RATE),
                                 np.random.normal(scale=CONVERGE_RATE),
-                                np.random.normal(loc=0, scale=CONVERGE_RATE, size=1))
+                                np.random.normal(loc=0, scale=CONVERGE_RATE))
 
-    chromosome.assign_neighborhoods()
+    chromosome.assign_neigh_to_towers()
     chromosome.update_fittness()
     return chromosome
 
@@ -113,8 +115,8 @@ def recombination(parent1: Chromosome, parent2: Chromosome, P_rec):
         tower_list2.append(gen)
     offspring1 = Chromosome(tower_list1)
     offspring2 = Chromosome(tower_list2)
-    offspring1.assign_neighborhoods()
-    offspring2.assign_neighborhoods()
+    offspring1.assign_neigh_to_towers()
+    offspring2.assign_neigh_to_towers()
     return offspring1, offspring2
 
 
@@ -168,7 +170,7 @@ def cut_and_crossfill(parent1: Chromosome, parent2: Chromosome):
     return offspring1, offspring2
 
 
-def get_rand_population():
+def gen_rand_population():
     generation = []
     for _ in range(globals.POPULATION_SIZE):
         tower_count = randrange(1, globals.MAX_TOWER_COUNT + 1)

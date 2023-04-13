@@ -1,8 +1,8 @@
 import globals
-
+import numpy as np
 
 class Tower:
-    def __init__(self, x_value, y_value, bandwidth):
+    def __init__(self, x_value, y_value, bandwidth: float):
         self.x = x_value
         self.y = y_value
         self.bandwidth = bandwidth
@@ -31,7 +31,7 @@ class Tower:
     def obj_func(self):
         return self.satisfaction() - self.total_build_cost()  # todo change to / to prevent neg obj
 
-    def set_xANDyANDbw(self, rand1, rand2, rand3):
+    def set_xANDyANDbw(self, rand1, rand2, rand3: float):
         x_val = self.x + rand1
         y_val = self.y + rand2
         band_width = self.bandwidth + rand3

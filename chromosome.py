@@ -10,15 +10,16 @@ import matplotlib.pyplot as plt
 class Chromosome:
     def __init__(self, gens: List[Tower]):
         self.gens = gens
-        self.assign_neighborhoods()
-        self.__fitness = self.update_fittness()
+        self.__fitness = float()
+        self.assign_neigh_to_towers()
+        self.update_fittness()
 
     def __objective_function(self):
         total_cost_build_towers = 0
         total_satisfactions = 0
-        for i in self.gens:
-            total_cost_build_towers += i.total_build_cost()
-            total_satisfactions += i.satisfaction()
+        for tower in self.gens:
+            total_cost_build_towers += tower.total_build_cost()
+            total_satisfactions += tower.satisfaction()
 
         return total_satisfactions - total_cost_build_towers
 
@@ -27,9 +28,8 @@ class Chromosome:
 
     def update_fittness(self):
         self.__fitness = self.__objective_function()
-        return self.__fitness
 
-    def assign_neighborhoods(self):
+    def assign_neigh_to_towers(self):
         for neigh in CITY:
             min_dist = inf
             min_tower = None
