@@ -1,10 +1,12 @@
 from cmath import inf
 from typing import List
+
+import matplotlib.pyplot as plt
 import numpy as np
+
 import globals
 from globals import CITY
 from tower import Tower
-import matplotlib.pyplot as plt
 
 
 class Chromosome:
@@ -55,3 +57,7 @@ class Chromosome:
                 plt.scatter(x, y, color=colors[i])
 
         plt.show()
+
+    def clone(self, gens: List[Tower]):
+        new_chromosome = Chromosome(gens)
+        return new_chromosome

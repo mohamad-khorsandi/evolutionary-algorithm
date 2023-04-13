@@ -1,14 +1,15 @@
-from objective_utilities import user_bandwidth
-from tower import Tower
 import numpy as np
 from numpy.linalg import inv
+
+from objective_utilities import user_bandwidth
+from tower import Tower
 
 
 class Neighborhood:
     def __init__(self, x, y, population):
         self.x = x
         self.y = y
-        self.population = population
+        self.population = population  # Todo
 
     def neigh_satisfaction(self, tower: Tower):
         return self.population * user_bandwidth(self.population, tower.bandwidth)
