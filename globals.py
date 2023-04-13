@@ -13,14 +13,15 @@ CITY_COL = None
 CITY = []
 
 # hyper parameters
-MAX_TOWER_COUNT = 5
-POPULATION_SIZE = 10
-MAX_BAND_WIDTH = 1000 # todo calculate
+MAX_TOWER_COUNT = 5#25
+POPULATION_SIZE = 10#50
+MAX_BAND_WIDTH = 1000#15000
 ITERATION = 10
-PARENT_POOL_SIZE = 3
-P_MUT = 1
-P_REC = 1
-CONVERGE_RATE = 10
+PARENT_POOL_SIZE = 4
+P_MUT = .1
+P_REC = .9
+CONVERGE_RATE = 10#todo
+
 def init_globals():
     assert PARENT_POOL_SIZE <= POPULATION_SIZE
     __read_config()
@@ -47,7 +48,7 @@ def __make_city_list():
     global CITY_COL
     global CITY
 
-    with open('pop2.csv') as csv_file:
+    with open('blocks_population.csv') as csv_file:
         csv_reader = csv.reader(csv_file, delimiter=',')
         population = np.array(list(csv_reader)).astype(float)
     CITY_ROW = population.shape[0]

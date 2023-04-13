@@ -1,5 +1,4 @@
 from random import randrange, uniform, choices
-
 import matplotlib.pyplot as plt
 
 import globals
@@ -12,28 +11,31 @@ def main():
     init_globals()
     population = gen_rand_population()
     fittness_hist = []
-    for _ in range(globals.ITERATION):
-        fittness_hist.append(np.mean([c.get_fittness() for c in population]))
+    best_hist = []
+    for j in range(globals.ITERATION):
+        fittness_list = np.array([c.get_fittness() for c in population])
+        fittness_hist.append(np.mean(fittness_list))
+        best_hist.append(population[fittness_list.argmax()])
+
         parent_pool = select_parent(population, PARENT_POOL_SIZE)
         children = []
+        print(j, "*****************")
         for i in range(0, PARENT_POOL_SIZE - 1, 2):
             p1, p2 = parent_pool[i], parent_pool[i + 1]
             for c in recombination(p1, p2, globals.P_REC):
                 mutation(c, globals.P_MUT)
                 children.append(c)
+
         replace_children(population, children)
 
-    plt.plot(range(globals.ITERATION), fittness_hist)
+    plt.plot(range(globals.ITERATION), fittness_hist, color='b')
+    plt.plot(range(globals.ITERATION), [c.get_fittness() for c in best_hist], color='r')
     plt.show()
 
 
 def replace_children(population: list, children):
-    for _ in range(len(children)):
-        prob_list = get_weight_list(population, reverse=True)
-        idx_tobe_removed = choices(range(len(population)), prob_list)[0]
-        del population[idx_tobe_removed]
-
-    population.extend(children)
+    population.sort(key=lambda x: x.get_fittness(), reverse=True)
+    population[-len(children):] = children
 
 
 def select_parent(generation, count):
