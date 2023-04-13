@@ -1,4 +1,5 @@
 from random import randrange, uniform, choices
+
 import matplotlib.pyplot as plt
 
 import globals
@@ -13,10 +14,9 @@ def main():
     fittness_hist = []
     best_hist = []
     for j in range(globals.ITERATION):
-        fittness_list = np.array([c.get_fittness() for c in population])
-        fittness_hist.append(np.mean(fittness_list))
-        best_hist.append(population[fittness_list.argmax()])
-
+        all_fittness = np.array([c.get_fittness() for c in population])
+        fittness_hist.append(np.mean(all_fittness))
+        best_hist.append(population[all_fittness.argmax()])
         parent_pool = select_parent(population, PARENT_POOL_SIZE)
         children = []
         print(j, "*****************")
@@ -60,20 +60,21 @@ def get_weight_list(chromosome_list: list, reverse=False):
 
 
 def mutation(chromosome, P_mut):
+    tower_list = []
     for gene in chromosome.gens:
         if np.random.binomial(1, P_mut, 1):
-            gene.set_xANDyANDbw(np.random.normal(scale=CONVERGE_RATE),
-                                np.random.normal(scale=CONVERGE_RATE),
-                                np.random.normal(loc=0, scale=CONVERGE_RATE))
+            g = Tower(gene.x + np.random.normal(scale=CONVERGE_RATE), gene.y + np.random.normal(scale=CONVERGE_RATE),
+                      + g.bandwidth + np.random.normal(loc=0, scale=CONVERGE_RATE))
+            tower_list.append(g)
+        else:
+            tower_list.append(gene)
 
-    chromosome.assign_neigh_to_towers()
-    chromosome.update_fittness()
-    return chromosome
+    return chromosome.clone(tower_list)
 
 
 def recombination(parent1: Chromosome, parent2: Chromosome, P_rec):
     if not np.random.binomial(1, P_rec, 1):
-        return parent1, parent2
+        return parent1.clone(parent1.gens), parent2.clone(parent2.gens)
 
     # Determine the shorter parent
     shorter_parent = parent1 if len(parent1.gens) < len(parent2.gens) else parent2
@@ -117,8 +118,6 @@ def recombination(parent1: Chromosome, parent2: Chromosome, P_rec):
         tower_list2.append(gen)
     offspring1 = Chromosome(tower_list1)
     offspring2 = Chromosome(tower_list2)
-    offspring1.assign_neigh_to_towers()
-    offspring2.assign_neigh_to_towers()
     return offspring1, offspring2
 
 
@@ -130,9 +129,9 @@ def cut_and_crossfill(parent1: Chromosome, parent2: Chromosome):
     crossover_point = np.random.randint(1, len(shorter_parent.gens) - 1)
 
     # Create the offspring by copying the first part of the shorter parent
-    offspring1 = shorter_parent.gens[:crossover_point]
+    tower_list1 = shorter_parent.gens[:crossover_point]
 
-    offspring2 = longer_parent.gens[:crossover_point]
+    tower_list2 = longer_parent.gens[:crossover_point]
 
     # Fill in the second part of the offspring with values from the longer parent that are not already in the offspring
     start = crossover_point
@@ -140,13 +139,13 @@ def cut_and_crossfill(parent1: Chromosome, parent2: Chromosome):
     repeat = 0
     for i in range(start, end):
         find = 0
-        for g in offspring1:
+        for g in tower_list1:
             if longer_parent.gens[i].x == g.x and longer_parent.gens[i].y == g.y:
                 find = 1
                 break
         if find == 0:
             if repeat == 0:
-                offspring1.append(longer_parent.gens[i])
+                tower_list1.append(longer_parent.gens[i])
         if repeat == 0 and i == end - 1:
             repeat = 1
             start = 0
@@ -157,17 +156,20 @@ def cut_and_crossfill(parent1: Chromosome, parent2: Chromosome):
     repeat = 0
     for i in range(start, end):
         find = 0
-        for g in offspring2:
+        for g in tower_list2:
             if longer_parent.gens[i].x == g.x and longer_parent.gens[i].y == g.y:
                 find = 1
                 break
         if find == 0:
             if repeat == 0:
-                offspring2.append(shorter_parent.gens[i])
+                tower_list2.append(shorter_parent.gens[i])
         if repeat == 0 and i == end - 1:
             repeat = 1
             start = 0
             end = crossover_point
+
+    offspring1 = Chromosome(tower_list1)
+    offspring2 = Chromosome(tower_list2)
 
     return offspring1, offspring2
 

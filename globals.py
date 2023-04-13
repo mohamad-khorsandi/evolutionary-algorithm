@@ -1,6 +1,8 @@
 import csv
 import json
+
 import numpy as np
+
 from neighborhood import Neighborhood
 
 # problem config
@@ -13,19 +15,21 @@ CITY_COL = None
 CITY = []
 
 # hyper parameters
-MAX_TOWER_COUNT = 5#25
-POPULATION_SIZE = 10#50
-MAX_BAND_WIDTH = 1000#15000
-ITERATION = 10
-PARENT_POOL_SIZE = 4
+MAX_TOWER_COUNT = 40  # 25
+POPULATION_SIZE = 50  # 50
+MAX_BAND_WIDTH = 25000  # 15000
+ITERATION = 200
+PARENT_POOL_SIZE = 25
 P_MUT = .1
 P_REC = .9
-CONVERGE_RATE = 10#todo
+CONVERGE_RATE = 10  # todo
+
 
 def init_globals():
     assert PARENT_POOL_SIZE <= POPULATION_SIZE
     __read_config()
     __make_city_list()
+
 
 def __read_config():
     with open('problem_config.json') as user_file:
@@ -53,6 +57,8 @@ def __make_city_list():
         population = np.array(list(csv_reader)).astype(float)
     CITY_ROW = population.shape[0]
     CITY_COL = population.shape[1]
+    print(CITY_ROW)
+    print(CITY_COL)
 
     for i in range(CITY_ROW):
         for j in range(CITY_COL):
