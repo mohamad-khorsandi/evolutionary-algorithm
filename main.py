@@ -1,7 +1,5 @@
 from random import randrange, uniform, choices
-
 import matplotlib.pyplot as plt
-
 import globals
 from chromosome import Chromosome
 from globals import *
@@ -19,14 +17,22 @@ def main():
         best_hist.append(population[all_fittness.argmax()])
         parent_pool = select_parent(population, PARENT_POOL_SIZE)
         children = []
-        print(j, "*****************")
+        print(j, "iteration")
         for i in range(0, PARENT_POOL_SIZE - 1, 2):
+            print('start pp:')
             p1, p2 = parent_pool[i], parent_pool[i + 1]
+            print('end pp.')
+            print('start recombination:')
             for c in recombination(p1, p2, globals.P_REC):
+                print('end recombination.')
+                print('start mut:')
                 mutation(c, globals.P_MUT)
+                print('end mut.')
                 children.append(c)
 
+        print('start replace:')
         replace_children(population, children)
+        print('end replace.')
 
     plt.plot(range(globals.ITERATION), fittness_hist, color='b')
     plt.plot(range(globals.ITERATION), [c.get_fittness() for c in best_hist], color='r')
@@ -36,8 +42,8 @@ def main():
 def replace_children(population: list, children):
     fittness_list = np.array([c.get_fittness() for c in population])
     k_smallest_idx = np.argpartition(fittness_list, len(children))
-    for i, sml_idx in enumerate(k_smallest_idx):
-        population[sml_idx] = children[i]
+    for i in range(len(children)):
+        population[k_smallest_idx[i]] = children[i]
 
 
 def select_parent(generation, count):
@@ -54,7 +60,9 @@ def get_weight_list(chromosome_list: list, reverse=False):
     fittness_sum = sum(fittness_list)
     weight_list = [p / fittness_sum for p in fittness_list]
 
-    assert any([0 <= p <= 1 for p in weight_list])
+    if not any([0 <= p <= 1 for p in weight_list]):
+        print(weight_list)
+        assert False
     if reverse:
         return [1 - p for p in weight_list]
     else:
@@ -65,12 +73,11 @@ def mutation(chromosome, P_mut):
     tower_list = []
     for gene in chromosome.gens:
         if np.random.binomial(1, P_mut, 1):
-            g = Tower(gene.x + np.random.normal(scale=CONVERGE_RATE), gene.y + np.random.normal(scale=CONVERGE_RATE),
-                      + gene.bandwidth + np.random.normal(loc=0, scale=CONVERGE_RATE))
+            g = Tower(gene.x + np.random.normal(scale=MUT_MOVE_RATE), gene.y + np.random.normal(scale=MUT_MOVE_RATE),
+                      + gene.bandwidth + np.random.normal(loc=0, scale=MUT_CHANGE_BW_RATE))
             tower_list.append(g)
         else:
             tower_list.append(gene)
-
     return chromosome.clone(tower_list)
 
 

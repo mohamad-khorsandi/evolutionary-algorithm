@@ -1,8 +1,8 @@
 import numpy as np
 from numpy.linalg import inv
-
 from objective_utilities import user_bandwidth
 from tower import Tower
+from globals import *
 
 
 class Neighborhood:
@@ -34,16 +34,21 @@ class Neighborhood:
     def satisfaction(self, tower: Tower):
         satisfaction_score = 0
         user_bw = user_bandwidth(self.population, self.neigh_actual_bandwidth(tower))
-        if user_bw < 0.2:
+        if user_bw < USER_SATISFACTION_LEVELS[0]:
             satisfaction_score = 0
-        elif 0.2 <= user_bw <= 1:
-            satisfaction_score = 10
-        elif 1 <= user_bw < 3:
-            satisfaction_score = 20
-        elif user_bw >= 3:
-            satisfaction_score = 30
+
+        elif USER_SATISFACTION_LEVELS[0] <= user_bw <= USER_SATISFACTION_LEVELS[1]:
+            satisfaction_score = USER_SATISFACTION_SCORES[0]
+
+        elif USER_SATISFACTION_LEVELS[1] <= user_bw < USER_SATISFACTION_LEVELS[2]:
+            satisfaction_score = USER_SATISFACTION_SCORES[1]
+
+        elif user_bw >= USER_SATISFACTION_LEVELS[2]:
+            satisfaction_score = USER_SATISFACTION_SCORES[2]
 
         return satisfaction_score * self.population
 
     def dis(self, x, y):
         return np.sqrt(((self.x - x) ** 2) + ((self.y - y) ** 2))
+
+
