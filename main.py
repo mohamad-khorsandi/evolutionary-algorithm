@@ -34,8 +34,10 @@ def main():
 
 
 def replace_children(population: list, children):
-    population.sort(key=lambda x: x.get_fittness(), reverse=True)
-    population[-len(children):] = children
+    fittness_list = np.array([c.get_fittness() for c in population])
+    k_smallest_idx = np.argpartition(fittness_list, len(children))
+    for i, sml_idx in enumerate(k_smallest_idx):
+        population[sml_idx] = children[i]
 
 
 def select_parent(generation, count):
