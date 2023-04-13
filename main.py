@@ -66,7 +66,7 @@ def mutation(chromosome, P_mut):
     for gene in chromosome.gens:
         if np.random.binomial(1, P_mut, 1):
             g = Tower(gene.x + np.random.normal(scale=CONVERGE_RATE), gene.y + np.random.normal(scale=CONVERGE_RATE),
-                      + g.bandwidth + np.random.normal(loc=0, scale=CONVERGE_RATE))
+                      + gene.bandwidth + np.random.normal(loc=0, scale=CONVERGE_RATE))
             tower_list.append(g)
         else:
             tower_list.append(gene)
