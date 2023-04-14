@@ -1,8 +1,24 @@
+import csv
+import numpy as np
 from numpy.linalg import inv
-
-from globals import *
+import constants
 from objective_utilities import user_bandwidth
 from tower import Tower
+
+
+def make_city_list():
+    with open('blocks_population.csv') as csv_file:
+        csv_reader = csv.reader(csv_file, delimiter=',')
+        population = np.array(list(csv_reader)).astype(float)
+    constants.CITY_ROW = population.shape[0]
+    constants.CITY_COL = population.shape[1]
+
+    for i in range(constants.CITY_ROW):
+        for j in range(constants.CITY_COL):
+            tmp_nbr = Neighborhood(i, j, population[i][j])
+            constants.CITY.append(tmp_nbr)
+
+    constants.MAX_NEIGH_POPULATION = np.max(population)
 
 
 class Neighborhood:
@@ -31,38 +47,23 @@ class Neighborhood:
         actual_bandwidth = cov * self.neigh_nominal_bandwidth(tower)
         return actual_bandwidth
 
-    # def satisfaction(self, tower: Tower):
-    #     satisfaction_score = 0
-    #     user_bw = user_bandwidth(self.population, self.neigh_actual_bandwidth(tower))
-    #     if user_bw < USER_SATISFACTION_LEVELS[0]:
-    #         satisfaction_score = 0
-    #
-    #     elif USER_SATISFACTION_LEVELS[0] <= user_bw <= USER_SATISFACTION_LEVELS[1]:
-    #         satisfaction_score = USER_SATISFACTION_SCORES[0]
-    #
-    #     elif USER_SATISFACTION_LEVELS[1] <= user_bw < USER_SATISFACTION_LEVELS[2]:
-    #         satisfaction_score = USER_SATISFACTION_SCORES[1]
-    #
-    #     elif user_bw >= USER_SATISFACTION_LEVELS[2]:
-    #         satisfaction_score = USER_SATISFACTION_SCORES[2]
-    #
-    #     return satisfaction_score * self.population
-
     def satisfaction(self, tower: Tower):
         satisfaction_score = 0
         user_bw = user_bandwidth(self.population, self.neigh_actual_bandwidth(tower))
-        if user_bw < 0.2:
+        if user_bw < constants.USER_SATISFACTION_LEVELS[0]:
             satisfaction_score = 0
-        elif 0.2 <= user_bw <= 1:
-            satisfaction_score = 10
-        elif 1 <= user_bw < 3:
-            satisfaction_score = 20
-        elif user_bw >= 3:
-            satisfaction_score = 30
+
+        elif constants.USER_SATISFACTION_LEVELS[0] <= user_bw <= constants.USER_SATISFACTION_LEVELS[1]:
+            satisfaction_score = constants.USER_SATISFACTION_SCORES[0]
+
+        elif constants.USER_SATISFACTION_LEVELS[1] <= user_bw < constants.USER_SATISFACTION_LEVELS[2]:
+            satisfaction_score = constants.USER_SATISFACTION_SCORES[1]
+
+        elif user_bw >= constants.USER_SATISFACTION_LEVELS[2]:
+            satisfaction_score = constants.USER_SATISFACTION_SCORES[2]
 
         return satisfaction_score * self.population
 
+
     def dis(self, x, y):
         return np.sqrt(((self.x - x) ** 2) + ((self.y - y) ** 2))
-
-

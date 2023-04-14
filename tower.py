@@ -1,4 +1,4 @@
-import globals
+import constants
 
 
 class Tower:
@@ -12,31 +12,31 @@ class Tower:
         self.serve_neighborhood = []
 
     def set_x(self, x_val):
-        if 0 <= x_val <= globals.CITY_ROW:
+        if 0 <= x_val <= constants.CITY_ROW:
             self.x = x_val
         elif x_val < 0:
             self.x = 0
-        elif x_val > globals.CITY_ROW:
-            self.x = globals.CITY_ROW
+        elif x_val > constants.CITY_ROW:
+            self.x = constants.CITY_ROW
 
     def set_y(self, y_val):
-        if 0 <= y_val <= globals.CITY_COL:
+        if 0 <= y_val <= constants.CITY_COL:
             self.y = y_val
         elif y_val < 0:
             self.y = 0
-        elif y_val > globals.CITY_COL:
-            self.y = globals.CITY_COL
+        elif y_val > constants.CITY_COL:
+            self.y = constants.CITY_COL
 
     def set_bw(self, bw):
-        if 0 <= bw <= globals.MAX_BAND_WIDTH:
+        if 0 <= bw <= constants.MAX_BAND_WIDTH:
             self.bandwidth = bw
         elif bw < 0:
             self.bandwidth = 0
-        elif bw > globals.MAX_BAND_WIDTH:
-            self.bandwidth = globals.MAX_BAND_WIDTH
+        elif bw > constants.MAX_BAND_WIDTH:
+            self.bandwidth = constants.MAX_BAND_WIDTH
 
     def total_build_cost(self):
-        return globals.TOWER_CONSTRUCTION_COST + (self.bandwidth * globals.TOWER_MAINTENANCE_COST)
+        return constants.TOWER_CONSTRUCTION_COST + (self.bandwidth * constants.TOWER_MAINTENANCE_COST)
 
     def satisfaction(self):
         total_satisfaction_score = 0
@@ -46,4 +46,4 @@ class Tower:
         return total_satisfaction_score
 
     def obj_func(self):
-        return self.satisfaction() - self.total_build_cost()  # todo change to / to prevent neg obj
+        return self.satisfaction() - self.total_build_cost()

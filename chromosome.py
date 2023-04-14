@@ -1,11 +1,9 @@
 from cmath import inf
 from typing import List
-
 import matplotlib.pyplot as plt
 import numpy as np
-
-import globals
-from globals import CITY
+import constants
+from constants import CITY
 from tower import Tower
 
 
@@ -13,23 +11,25 @@ class Chromosome:
     def __init__(self, gens: List[Tower]):
         self.gens = gens
         self.__fitness = float()
-        self.assign_neigh_to_towers()
-        self.update_fittness()
+        self.need_update = True
 
     def __objective_function(self):
-        total_cost_build_towers = 0
-        total_satisfactions = 0
+        total_cost_build_towers = 0.0
+        total_satisfactions = 0.0
         for tower in self.gens:
             total_cost_build_towers += tower.total_build_cost()
             total_satisfactions += tower.satisfaction()
 
+        assert (total_satisfactions - total_cost_build_towers) != 0
+
         return total_satisfactions - total_cost_build_towers
 
     def get_fittness(self):
+        if self.need_update:
+            self.assign_neigh_to_towers()
+            self.__fitness = self.__objective_function()
+            self.need_update = False
         return self.__fitness
-
-    def update_fittness(self):
-        self.__fitness = self.__objective_function()
 
     def assign_neigh_to_towers(self):
         for neigh in CITY:
@@ -43,8 +43,8 @@ class Chromosome:
             min_tower.serve_neighborhood.append(neigh)
 
     def plot(self):
-        colors = ['r', 'g', 'b', 'c', 'm', 'y', 'k']
-        plt.figure(figsize=(globals.CITY_ROW, globals.CITY_COL))
+        colors = ['r', 'g', 'b', 'c', 'm', 'y', 'k'] # todo
+        plt.figure(figsize=(constants.CITY_ROW, constants.CITY_COL))
         for i, tower in enumerate(self.gens):
             plt.scatter(tower.x, tower.y, marker='>', color=colors[i])
             neigh_points = []
@@ -58,6 +58,8 @@ class Chromosome:
 
         plt.show()
 
-    def clone(self, gens: List[Tower]):
-        new_chromosome = Chromosome(gens)
-        return new_chromosome
+    def gens_changed(self):
+        self.need_update = True
+
+    def is_gens_changed(self):
+        return self.need_update
