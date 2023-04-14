@@ -12,20 +12,22 @@ class Tower:
         self.serve_neighborhood = []
 
     def set_x(self, x_val):
-        if 0 <= x_val <= constants.CITY_ROW:
+        if 0 <= x_val <= constants.CITY_ROW - 1:
             self.x = x_val
+
         elif x_val < 0:
             self.x = 0
+
         elif x_val > constants.CITY_ROW - 1:
             self.x = constants.CITY_ROW - 1
 
     def set_y(self, y_val):
-        if 0 <= y_val <= constants.CITY_COL:
+        if 0 <= y_val <= constants.CITY_COL - 1:
             self.y = y_val
         elif y_val < 0:
             self.y = 0
-        elif y_val > constants.CITY_COL:
-            self.y = constants.CITY_COL
+        elif y_val > constants.CITY_COL - 1:
+            self.y = constants.CITY_COL - 1
 
     def set_bw(self, bw):
         if 0 <= bw <= constants.MAX_BAND_WIDTH:
