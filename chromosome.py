@@ -42,8 +42,26 @@ class Chromosome:
                     min_tower = tower
             min_tower.serve_neighborhood.append(neigh)
 
+
     def plot(self):
-        colors = ['r', 'g', 'b', 'c', 'm', 'y', 'k'] # todo
+        colors = ['r', 'g', 'b', 'c', 'm', 'y', 'k'] * len(self.gens) #todo
+        plt.figure(figsize=(constants.CITY_ROW, constants.CITY_COL))
+        for i, tower in enumerate(self.gens):
+            plt.scatter(tower.x, tower.y, marker='>', color=colors[i])
+            neigh_points = []
+
+            for n in tower.serve_neighborhood:
+                neigh_points.append([n.x, n.y])
+
+            if len(tower.serve_neighborhood) > 0:
+                x, y = np.array(neigh_points).T
+                plt.scatter(x, y, color=colors[i], s=50)
+
+        plt.show()
+
+    def save_plot(self, name: str):
+        plt.clf()
+        colors = ['r', 'g', 'b', 'c', 'm', 'y', 'k'] * len(self.gens) #todo
         plt.figure(figsize=(constants.CITY_ROW, constants.CITY_COL))
         for i, tower in enumerate(self.gens):
             plt.scatter(tower.x, tower.y, marker='>', color=colors[i])
@@ -56,7 +74,7 @@ class Chromosome:
                 x, y = np.array(neigh_points).T
                 plt.scatter(x, y, color=colors[i])
 
-        plt.show()
+        plt.savefig(name)
 
     def gens_changed(self):
         self.need_update = True

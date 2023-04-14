@@ -11,15 +11,15 @@ CITY = []
 MAX_NEIGH_POPULATION = None
 
 # hyper parameters
-MAX_TOWER_COUNT = 25  # 25
-POPULATION_SIZE = 50  # 50
-MAX_BAND_WIDTH = 6000000  # 15000
+MAX_TOWER_COUNT = 25
+POPULATION_SIZE = 50
+MAX_BAND_WIDTH = 25000
 ITERATION = 10
 PARENT_POOL_SIZE = 24
 P_MUT = 1
 P_REC = 0
-MUT_MOVE_RATE = 10  # todo
-MUT_CHANGE_BW_RATE = 3000000
+MUT_MOVE_RATE = 10
+MUT_CHANGE_BW_RATE = 1000
 
 
 def __read_config():
@@ -37,13 +37,3 @@ def __read_config():
     USER_SATISFACTION_LEVELS = parsed_json['user_satisfaction_levels']
     USER_SATISFACTION_SCORES = parsed_json['user_satisfaction_scores']
 
-
-
-
-#todo
-
-# def __calculate_max_bw():
-#     global MAX_BAND_WIDTH
-#     global MAX_NEIGH_POPULATION
-#     avg_pop = np.mean([c.population for c in CITY])
-#     MAX_BAND_WIDTH = USER_SATISFACTION_SCORES[2] * avg_pop * len(CITY) - TOWER_CONSTRUCTION_COST

@@ -1,3 +1,5 @@
+import os
+import random
 from random import randrange, uniform
 import matplotlib.pyplot as plt
 import numpy as np
@@ -8,25 +10,32 @@ from evolution_operations.parent_selection import select_parent
 from evolution_operations.recombination import whole_arithmatic_crossover
 from tower import Tower
 from neighborhood import make_city_list
-
+import shutil
 
 fittness_hist = []
 best_hist = []
+res_dir = "res"
 
 
-def init_constants():
+def init():
     assert constants.PARENT_POOL_SIZE <= constants.POPULATION_SIZE
     assert constants.PARENT_POOL_SIZE % 2 == 0
     constants.__read_config()
     make_city_list()
 
+    dir_exists = os.path.exists(res_dir)
+    if dir_exists:
+        shutil.rmtree(res_dir)
+
+    os.mkdir(res_dir)
+
 
 def main():
-    init_constants()
+    init()
     population = gen_rand_population()
     for i in range(constants.ITERATION):
         parent_pool = select_parent(population, constants.PARENT_POOL_SIZE)
-        recode_statistics(population)
+        recode_statistics(population, i)
         children = []
         print(i)
         for j in range(0, constants.PARENT_POOL_SIZE - 1, 2):
@@ -39,17 +48,36 @@ def main():
     show_statistics()
 
 
-def recode_statistics(population: list[Chromosome]):
+def recode_statistics(population: list[Chromosome], iteration: int):
     all_fittness = np.array([c.get_fittness() for c in population])
     fittness_hist.append(np.mean(all_fittness))
     best_hist.append(population[all_fittness.argmax()])
+    population[all_fittness.argmax()].save_plot(res_dir + '/' + str(iteration) + '.png')
 
 
 def show_statistics():
+    plt.clf()
     plt.plot(range(constants.ITERATION), fittness_hist, color='b')
     plt.plot(range(constants.ITERATION), [c.get_fittness() for c in best_hist], color='r')
+    print_statistics()
     plt.show()
 
+
+def print_statistics():
+    print('* Best solution:')
+    best_solution = best_hist[constants.ITERATION - 1]
+    print(f"* Fitness: {best_solution.get_fittness()}")
+    print(f"* Number of tower: {len(best_solution.gens)}")
+    print()
+    print("* Information of towers:")
+    for i, t in enumerate(best_solution.gens):
+        print(f"Tower {i}:")
+        print(f"Coordinate: ({t.x}, {t.y}) | Bandwidth: {t.bandwidth} | Building cost: {t.total_build_cost()}")
+        print('- The Neighborhood that tower supports them:')
+        for n in t.serve_neighborhood:
+            print(f"coordinate: ({n.x},{n.y}) | population: {n.population} | satisfaction:{n.satisfaction(t)}", end=" ")
+        print()
+        print()
 
 def replace_children(population: list, children):
     for c in children:
@@ -63,6 +91,7 @@ def replace_children(population: list, children):
 
 
 def gen_rand_population():
+    random.seed(42)
     generation = []
     for _ in range(constants.POPULATION_SIZE):
         tower_count = randrange(1, constants.MAX_TOWER_COUNT + 1)
