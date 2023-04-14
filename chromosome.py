@@ -55,7 +55,7 @@ class Chromosome:
 
             if len(tower.serve_neighborhood) > 0:
                 x, y = np.array(neigh_points).T
-                plt.scatter(x, y, color=colors[i], s=50)
+                plt.scatter(x, y, color=colors[i])
         plt.show()
 
     def save_plot(self, name: str):

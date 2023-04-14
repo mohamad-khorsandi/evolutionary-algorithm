@@ -16,8 +16,8 @@ class Tower:
             self.x = x_val
         elif x_val < 0:
             self.x = 0
-        elif x_val > constants.CITY_ROW:
-            self.x = constants.CITY_ROW
+        elif x_val > constants.CITY_ROW - 1:
+            self.x = constants.CITY_ROW - 1
 
     def set_y(self, y_val):
         if 0 <= y_val <= constants.CITY_COL:
