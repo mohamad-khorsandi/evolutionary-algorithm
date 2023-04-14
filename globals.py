@@ -16,7 +16,7 @@ CITY = []
 MAX_NEIGH_POPULATION = None
 
 # hyper parameters
-MAX_TOWER_COUNT = 40  # 25
+MAX_TOWER_COUNT = 25  # 25
 POPULATION_SIZE = 50  # 50
 MAX_BAND_WIDTH = None  # 15000
 ITERATION = 50
@@ -73,7 +73,5 @@ def __make_city_list():
 def __calculate_max_bw():
     global MAX_BAND_WIDTH
     global MAX_NEIGH_POPULATION
-
     avg_pop = np.mean([c.population for c in CITY])
     MAX_BAND_WIDTH = USER_SATISFACTION_SCORES[2] * avg_pop * len(CITY) - TOWER_CONSTRUCTION_COST
-    print(MAX_BAND_WIDTH)

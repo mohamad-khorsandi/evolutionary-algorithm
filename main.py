@@ -1,5 +1,7 @@
 from random import randrange, uniform, choices
+
 import matplotlib.pyplot as plt
+
 import globals
 from chromosome import Chromosome
 from globals import *
@@ -23,12 +25,12 @@ def main():
             p1, p2 = parent_pool[i], parent_pool[i + 1]
             print('end pp.')
             print('start recombination:')
-            for c in recombination(p1, p2, globals.P_REC):
+            for c in one_point_crossover(p1, p2, globals.P_REC):
                 print('end recombination.')
                 print('start mut:')
-                mutation(c, globals.P_MUT)
+                c1 = mutation(c, globals.P_MUT)
                 print('end mut.')
-                children.append(c)
+                children.append(c1)
 
         print('start replace:')
         replace_children(population, children)
@@ -39,11 +41,26 @@ def main():
     plt.show()
 
 
+# def replace_children(population: list, children):
+#     fittness_list = np.array([c.get_fittness() for c in population])
+#     k_smallest_idx = np.argpartition(fittness_list, len(children))
+#     for i in range(len(children)):
+#         population[k_smallest_idx[i]] = children[i]
+
 def replace_children(population: list, children):
     fittness_list = np.array([c.get_fittness() for c in population])
     k_smallest_idx = np.argpartition(fittness_list, len(children))
+    # for i, sml_idx in enumerate(k_smallest_idx):
+    #     population[sml_idx] = children[i]
     for i in range(len(children)):
         population[k_smallest_idx[i]] = children[i]
+
+    population[-len(children):] = children
+
+
+# def replace_children(population: list, children):
+#     population.sort(key=lambda x: x.get_fittness(), reverse=True)
+#     population[-len(children):] = children
 
 
 def select_parent(generation, count):
@@ -78,104 +95,108 @@ def mutation(chromosome, P_mut):
             tower_list.append(g)
         else:
             tower_list.append(gene)
-    return chromosome.clone(tower_list)
+    new_chromosome = Chromosome(tower_list)
+    return new_chromosome
 
 
-def recombination(parent1: Chromosome, parent2: Chromosome, P_rec):
-    if not np.random.binomial(1, P_rec, 1):
-        return parent1.clone(parent1.gens), parent2.clone(parent2.gens)
+def whole_arithmatic_crossover(parent1: Chromosome, parent2: Chromosome, P_rec):
+    # if not np.random.binomial(1, P_rec, 1):
+    #     return parent1, parent2
 
-    # Determine the shorter parent
     shorter_parent = parent1 if len(parent1.gens) < len(parent2.gens) else parent2
     longer_parent = parent2 if len(parent1.gens) < len(parent2.gens) else parent1
-
-    # Calculate the crossover rate
     weight = np.random.uniform(0, 1)
 
-    # Create the first offspring by performing Whole Arithmetic Crossover
     tower_list1 = []
     for i in range(len(shorter_parent.gens)):
-        new_x = weight * parent1.gens[i].x + (1 - weight) * parent2.gens[i].x
-        new_y = weight * parent1.gens[i].y + (1 - weight) * parent2.gens[i].y
-        new_bw = weight * parent1.gens[i].bandwidth + (1 - weight) * parent2.gens[i].bandwidth
+        new_x = weight * shorter_parent.gens[i].x + (1 - weight) * longer_parent.gens[i].x
+        new_y = weight * shorter_parent.gens[i].y + (1 - weight) * longer_parent.gens[i].y
+        new_bw = weight * shorter_parent.gens[i].bandwidth + (1 - weight) * longer_parent.gens[i].bandwidth
         gen = Tower(new_x, new_y, new_bw)
         tower_list1.append(gen)
 
-    # Add any remaining genes from the longer parent to the first offspring
-    for i in range(len(shorter_parent.gens), len(longer_parent.gens)):
-        new_x = weight * longer_parent.gens[i].x
-        new_y = weight * longer_parent.gens[i].y
-        new_bw = weight * longer_parent.gens[i].bandwidth
-        gen = Tower(new_x, new_y, new_bw)
-        tower_list1.append(gen)
+    # for i in range(len(shorter_parent.gens), len(longer_parent.gens)):
+    #     new_x = weight * longer_parent.gens[i].x
+    #     new_y = weight * longer_parent.gens[i].y
+    #     new_bw = weight * longer_parent.gens[i].bandwidth
+    #     gen = Tower(new_x, new_y, new_bw)
+    #     tower_list1.append(gen)
 
-    # Create the second offspring by performing Whole Arithmetic Crossover (swapping parents)
     tower_list2 = []
     for i in range(len(shorter_parent.gens)):
-        new_x = (1 - weight) * parent1.gens[i].x + weight * parent2.gens[i].x
-        new_y = (1 - weight) * parent1.gens[i].y + weight * parent2.gens[i].y
-        new_bw = (1 - weight) * parent1.gens[i].bandwidth + weight * parent2.gens[i].bandwidth
+        new_x = (1 - weight) * shorter_parent.gens[i].x + weight * longer_parent.gens[i].x
+        new_y = (1 - weight) * shorter_parent.gens[i].y + weight * longer_parent.gens[i].y
+        new_bw = (1 - weight) * shorter_parent.gens[i].bandwidth + weight * longer_parent.gens[i].bandwidth
         gen = Tower(new_x, new_y, new_bw)
         tower_list2.append(gen)
 
-    # Add any remaining genes from the longer parent to the second offspring
     for i in range(len(shorter_parent.gens), len(longer_parent.gens)):
         new_x = (1 - weight) * longer_parent.gens[i].x
         new_y = (1 - weight) * longer_parent.gens[i].y
         new_bw = (1 - weight) * longer_parent.gens[i].bandwidth
         gen = Tower(new_x, new_y, new_bw)
         tower_list2.append(gen)
+
     offspring1 = Chromosome(tower_list1)
     offspring2 = Chromosome(tower_list2)
+
     return offspring1, offspring2
 
 
-def cut_and_crossfill(parent1: Chromosome, parent2: Chromosome):
+def one_point_crossover(parent1: Chromosome, parent2: Chromosome, P_rec):
+    # if not np.random.binomial(1, P_rec, 1) or len(parent1.gens) == 1 or len(parent2.gens) == 1:
+    #     return parent1, parent2
+
+    if len(parent1.gens) == 1 or len(parent2.gens) == 1:
+        return parent1, parent2
+
     shorter_parent = parent1 if len(parent1.gens) < len(parent2.gens) else parent2
     longer_parent = parent2 if len(parent1.gens) < len(parent2.gens) else parent1
 
     # Choose a random crossover point
-    crossover_point = np.random.randint(1, len(shorter_parent.gens) - 1)
+    crossover_point = np.random.randint(1, len(shorter_parent.gens))
 
     # Create the offspring by copying the first part of the shorter parent
     tower_list1 = shorter_parent.gens[:crossover_point]
+    tower_list1[crossover_point:] = longer_parent.gens[crossover_point:]
 
     tower_list2 = longer_parent.gens[:crossover_point]
+    tower_list2[crossover_point:] = shorter_parent.gens[crossover_point:]
 
-    # Fill in the second part of the offspring with values from the longer parent that are not already in the offspring
-    start = crossover_point
-    end = len(longer_parent.gens)
-    repeat = 0
-    for i in range(start, end):
-        find = 0
-        for g in tower_list1:
-            if longer_parent.gens[i].x == g.x and longer_parent.gens[i].y == g.y:
-                find = 1
-                break
-        if find == 0:
-            if repeat == 0:
-                tower_list1.append(longer_parent.gens[i])
-        if repeat == 0 and i == end - 1:
-            repeat = 1
-            start = 0
-            end = crossover_point
-
-    start = crossover_point
-    end = len(shorter_parent.gens)
-    repeat = 0
-    for i in range(start, end):
-        find = 0
-        for g in tower_list2:
-            if longer_parent.gens[i].x == g.x and longer_parent.gens[i].y == g.y:
-                find = 1
-                break
-        if find == 0:
-            if repeat == 0:
-                tower_list2.append(shorter_parent.gens[i])
-        if repeat == 0 and i == end - 1:
-            repeat = 1
-            start = 0
-            end = crossover_point
+    # # Fill in the second part of the offspring with values from the longer parent that are not already in the offspring
+    # start = crossover_point
+    # end = len(longer_parent.gens)
+    # repeat = 0
+    # for i in range(start, end):
+    #     find = 0
+    #     for g in tower_list1:
+    #         if longer_parent.gens[i].x == g.x and longer_parent.gens[i].y == g.y:
+    #             find = 1
+    #             break
+    #     if find == 0:
+    #         if repeat == 0:
+    #             tower_list1.append(longer_parent.gens[i])
+    #     if repeat == 0 and i == end - 1:
+    #         repeat = 1
+    #         start = 0
+    #         end = crossover_point
+    #
+    # start = crossover_point
+    # end = len(shorter_parent.gens)
+    # repeat = 0
+    # for i in range(start, end):
+    #     find = 0
+    #     for g in tower_list2:
+    #         if longer_parent.gens[i].x == g.x and longer_parent.gens[i].y == g.y:
+    #             find = 1
+    #             break
+    #     if find == 0:
+    #         if repeat == 0:
+    #             tower_list2.append(shorter_parent.gens[i])
+    #     if repeat == 0 and i == end - 1:
+    #         repeat = 1
+    #         start = 0
+    #         end = crossover_point
 
     offspring1 = Chromosome(tower_list1)
     offspring2 = Chromosome(tower_list2)
