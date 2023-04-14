@@ -60,7 +60,7 @@ def show_statistics():
     plt.plot(range(constants.ITERATION), fittness_hist, color='b')
     plt.plot(range(constants.ITERATION), [c.get_fittness() for c in best_hist], color='r')
     print_statistics()
-    plt.show()
+    plt.savefig(res_dir + '/' + 'total.png')
 
 
 def print_statistics():
@@ -79,6 +79,7 @@ def print_statistics():
         print()
         print()
 
+
 def replace_children(population: list, children):
     for c in children:
         c.gens_changed()
@@ -91,7 +92,7 @@ def replace_children(population: list, children):
 
 
 def gen_rand_population():
-    random.seed(42)
+    # random.seed(42)
     generation = []
     for _ in range(constants.POPULATION_SIZE):
         tower_count = randrange(1, constants.MAX_TOWER_COUNT + 1)
