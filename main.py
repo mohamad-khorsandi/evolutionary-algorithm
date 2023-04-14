@@ -59,13 +59,13 @@ def recode_statistics(population: list[Chromosome], iteration: int):
 
 
 def show_statistics(time):
-    print("total time of running algorithm: " + time)
+    print("total time of running algorithm: " + str(time))
     plt.clf()
     plt.plot(range(constants.ITERATION), fittness_hist, color='b')
     plt.plot(range(constants.ITERATION), [c.get_fittness() for c in best_hist], color='r')
-    print_best_solution()
     plt.savefig(res_dir + '/' + 'total.png')
-    best_hist[constants.ITERATION].save_plot(res_dir + '/best.png')
+    print_best_solution()
+    best_hist[constants.ITERATION - 1].save_plot(res_dir + '/best.png')
 
 
 def print_best_solution():
