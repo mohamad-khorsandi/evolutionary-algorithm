@@ -1,5 +1,6 @@
 import os
 import random
+import time
 from random import randrange, uniform
 import matplotlib.pyplot as plt
 import numpy as np
@@ -31,6 +32,7 @@ def init():
 
 
 def main():
+    start = time.time()
     init()
     population = gen_rand_population()
     for i in range(constants.ITERATION):
@@ -45,30 +47,32 @@ def main():
                 children.append(c1)
         replace_children(population, children)
 
-    show_statistics()
+    end = time.time()
+    show_statistics(end - start)
 
 
 def recode_statistics(population: list[Chromosome], iteration: int):
     all_fittness = np.array([c.get_fittness() for c in population])
     fittness_hist.append(np.mean(all_fittness))
     best_hist.append(population[all_fittness.argmax()])
-    population[all_fittness.argmax()].save_plot(res_dir + '/' + str(iteration) + '.png')
+    # population[all_fittness.argmax()].save_plot(res_dir + '/' + str(iteration) + '.png')
 
 
-def show_statistics():
+def show_statistics(time):
+    print("total time of running algorithm: " + time)
     plt.clf()
     plt.plot(range(constants.ITERATION), fittness_hist, color='b')
     plt.plot(range(constants.ITERATION), [c.get_fittness() for c in best_hist], color='r')
-    print_statistics()
+    print_best_solution()
     plt.savefig(res_dir + '/' + 'total.png')
+    best_hist[constants.ITERATION].save_plot(res_dir + '/best.png')
 
 
-def print_statistics():
+def print_best_solution():
     print('* Best solution:')
     best_solution = best_hist[constants.ITERATION - 1]
     print(f"* Fitness: {best_solution.get_fittness()}")
     print(f"* Number of tower: {len(best_solution.gens)}")
-    print()
     print("* Information of towers:")
     for i, t in enumerate(best_solution.gens):
         print(f"Tower {i}:")
@@ -77,7 +81,7 @@ def print_statistics():
         for n in t.serve_neighborhood:
             print(f"coordinate: ({n.x},{n.y}) | population: {n.population} | satisfaction:{n.satisfaction(t)}", end=" ")
         print()
-        print()
+        print("------------------------------------------------------")
 
 
 def replace_children(population: list, children):
@@ -92,7 +96,7 @@ def replace_children(population: list, children):
 
 
 def gen_rand_population():
-    # random.seed(42)
+    random.seed(42)
     generation = []
     for _ in range(constants.POPULATION_SIZE):
         tower_count = randrange(1, constants.MAX_TOWER_COUNT + 1)
