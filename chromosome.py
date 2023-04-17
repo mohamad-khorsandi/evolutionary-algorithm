@@ -20,15 +20,20 @@ class Chromosome:
             total_cost_build_towers += tower.total_build_cost()
             total_satisfactions += tower.satisfaction()
 
-        assert (total_satisfactions - total_cost_build_towers) != 0
-
+        assert total_satisfactions <= 7677280.0
         return total_satisfactions - total_cost_build_towers
 
     def get_fittness(self):
         if self.need_update:
+            for n in self.gens:
+                n.serve_neighborhood = []
+            assert sum([len(t.serve_neighborhood) for t in self.gens]) == 0
             self.assign_neigh_to_towers()
+            assert sum([len(t.serve_neighborhood) for t in self.gens]) == 400
             self.__fitness = self.__objective_function()
             self.need_update = False
+
+        assert sum([len(t.serve_neighborhood) for t in self.gens]) == 400
         return self.__fitness
 
     def assign_neigh_to_towers(self):

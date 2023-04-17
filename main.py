@@ -48,6 +48,8 @@ def main():
         replace_children(population, children)
 
     end = time.time()
+    best_hist[constants.ITERATION - 1].gens_changed()
+    best_hist[constants.ITERATION - 1].get_fittness()
     show_statistics(end - start)
 
 
