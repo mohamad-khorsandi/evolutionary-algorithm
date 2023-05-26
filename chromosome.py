@@ -26,6 +26,8 @@ class Chromosome:
 
     def get_fittness(self):
         if self.need_update:
+            for n in self.gens:
+                n.serve_neighborhood = []
             self.assign_neigh_to_towers()
             self.__fitness = self.__objective_function()
             self.need_update = False
